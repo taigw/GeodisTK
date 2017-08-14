@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cstdio>
 #include "util.h"
-#include "fast_marching_distance3d.h"
+#include "geodesic_distance_3d.h"
 using namespace std;
 
 void insert_point_to_list(std::vector<Point3D> * list, int start_position,  Point3D p)
@@ -150,7 +150,7 @@ void geodesic3d_fast_marching(const float * img, const unsigned char * seeds, fl
 }
 
 void geodesic3d_raster_scan(const float * img, const unsigned char * seeds, float * distance,
-                              int depth, int height, int width, float lambda)
+                              int depth, int height, int width, float lambda, int iteration)
 {
     // point state: 0--acceptd, 1--temporary, 2--far away
     // get initial accepted set and far away set
@@ -171,7 +171,7 @@ void geodesic3d_raster_scan(const float * img, const unsigned char * seeds, floa
     float sqrt3 = sqrt(3.0);
     float sqrt2 = sqrt(2.0);
     float sqrt1 = 1.0;
-    for(int it = 0; it<4; it++)
+    for(int it = 0; it<iteration; it++)
     {
         // forward scann
         int dd_f[13] = {-1, -1, -1, -1, -1,  0,  0,  0,  0,  1,  1,  1,  1};
@@ -197,7 +197,7 @@ void geodesic3d_raster_scan(const float * img, const unsigned char * seeds, floa
                         if(nd < 0 || nd >= depth || nh < 0 || nh >= height || nw < 0 || nw >= width) continue;
                         float q_dis = get_pixel<float>(distance, depth, height, width, nd, nh, nw);
                         float q_value = get_pixel<float>(img, depth, height, width, nd, nh, nw);
-                        float speed = (1.0 - lambda) + lambda/abs(p_value - q_value);
+                        float speed = (1.0 - lambda) + lambda/(abs(p_value - q_value) + 1e-5);
                         float delta_d = local_dis_f[i] / speed;
                         float temp_dis = q_dis + delta_d;
                         if(temp_dis < p_dis) p_dis = temp_dis;
@@ -213,7 +213,7 @@ void geodesic3d_raster_scan(const float * img, const unsigned char * seeds, floa
         int local_dis_b[13] = {sqrt2, sqrt3, sqrt2, sqrt3, sqrt1,
                                sqrt2, sqrt1, sqrt2, sqrt1,
                                sqrt2, sqrt3, sqrt2, sqrt3};
-        // forward pass
+        // backward pass
         for(int d = depth - 1; d >= 0; d--)
         {
             for(int h = height - 1; h >= 0; h--)
@@ -230,7 +230,7 @@ void geodesic3d_raster_scan(const float * img, const unsigned char * seeds, floa
                         if(nd < 0 || nd >= depth || nh < 0 || nh >= height || nw < 0 || nw >= width) continue;
                         float q_dis = get_pixel<float>(distance, depth, height, width, nd, nh, nw);
                         float q_value = get_pixel<float>(img, depth, height, width, nd, nh, nw);
-                        float speed = (1.0 - lambda) + lambda/abs(p_value - q_value);
+                        float speed = (1.0 - lambda) + lambda/(abs(p_value - q_value) + 1e-5);
                         float delta_d = local_dis_b[i] / speed;
                         float temp_dis = q_dis + delta_d;
                         if(temp_dis < p_dis) p_dis = temp_dis;

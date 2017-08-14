@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cstdio>
 #include "util.h"
-#include "fast_marching_distance2d.h"
+#include "geodesic_distance_2d.h"
 using namespace std;
 
 void insert_point_to_list(std::vector<Point2D> * list, int start_position,  Point2D p)
@@ -159,7 +159,7 @@ void geodesic2d_raster_scan(const float * img, const unsigned char * seeds, floa
         // forward scann
         int dh_f[4] = {-1, -1, -1, 0};
         int dw_f[4] = {-1, 0, 1, -1};
-        int local_dis_f[4] = {1.414, 1.0, 1.414, 1.0};
+        float local_dis_f[4] = {1.414, 1.0, 1.414, 1.0};
         // forward pass
         for(int h = 0; h < height; h++)
         {
@@ -185,7 +185,7 @@ void geodesic2d_raster_scan(const float * img, const unsigned char * seeds, floa
         // backward scann
         int dh_b[4] = {0, 1, 1, 1};
         int dw_b[4] = {1, -1, 0, 1};
-        int local_dis_b[4] = {1.0, 1.414, 1.0, 1.414};
+        float local_dis_b[4] = {1.0, 1.414, 1.0, 1.414};
         for(int h = height -1; h >= 0; h--)
         {
             for (int w = width - 1; w >= 0; w--)

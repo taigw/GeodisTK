@@ -20,6 +20,18 @@ def save_array_as_nifty_volume(data, filename):
     img = nibabel.Nifti1Image(data, np.eye(4))
     nibabel.save(img, filename)
 
+def geodesic_distance_3d(I, S, lamb, iter):
+    '''
+    get 3d geodesic disntance by raser scanning.
+    I: input image
+    S: binary image where non-zero pixels are used as seeds
+    lamb: weighting betwween 0 and 1. 
+          0: spatial euclidean distance without considering gradient
+          1: distance based on gradient only without using spatial distance
+    iter: number of iteration for raster scanning.
+    '''
+    return geodesic_distance.geodesic3d_raster_scan(I,S, lamb, iter)
+
 def test_geodesic_distance3d():
     
     I = load_nifty_volume_as_array("../data/img3d.nii")
@@ -30,7 +42,7 @@ def test_geodesic_distance3d():
     t0 = time.time()
 #    D1 = geodesic_distance.geodesic3d_fast_marching(I,S)
     t1 = time.time()
-    D2 = geodesic_distance.geodesic3d_raster_scan(I,S, 0.5)
+    D2 = geodesic_distance_3d(I,S, 0.5, 4)
     dt1 = t1 - t0
     dt2 = time.time() - t1
     print "runtime(s) fast marching {0:}".format(dt1)
