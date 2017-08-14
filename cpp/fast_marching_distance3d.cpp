@@ -150,7 +150,7 @@ void geodesic3d_fast_marching(const float * img, const unsigned char * seeds, fl
 }
 
 void geodesic3d_raster_scan(const float * img, const unsigned char * seeds, float * distance,
-                              int depth, int height, int width)
+                              int depth, int height, int width, float lambda)
 {
     // point state: 0--acceptd, 1--temporary, 2--far away
     // get initial accepted set and far away set
@@ -168,15 +168,18 @@ void geodesic3d_raster_scan(const float * img, const unsigned char * seeds, floa
             }
         }
     }
+    float sqrt3 = sqrt(3.0);
+    float sqrt2 = sqrt(2.0);
+    float sqrt1 = 1.0;
     for(int it = 0; it<4; it++)
     {
         // forward scann
         int dd_f[13] = {-1, -1, -1, -1, -1,  0,  0,  0,  0,  1,  1,  1,  1};
         int dh_f[13] = {-1, -1, -1,  0,  0, -1, -1, -1,  0, -1, -1, -1,  0};
         int dw_f[13] = {-1,  0,  1, -1,  0, -1,  0,  1, -1, -1,  0,  1, -1};
-        int local_dis_f[13] = {1.732, 1.414, 1.732, 1.414, 1.0,
-                               1.414, 1.000, 1.414, 1.000,
-                               1.732, 1.414, 1.732, 1.414};
+        int local_dis_f[13] = {sqrt3, sqrt2, sqrt3, sqrt2, sqrt1,
+                               sqrt2, sqrt1, sqrt2, sqrt1,
+                               sqrt3, sqrt2, sqrt3, sqrt2};
         // forward pass
         for(int d = 0; d < depth; d++)
         {
@@ -194,7 +197,8 @@ void geodesic3d_raster_scan(const float * img, const unsigned char * seeds, floa
                         if(nd < 0 || nd >= depth || nh < 0 || nh >= height || nw < 0 || nw >= width) continue;
                         float q_dis = get_pixel<float>(distance, depth, height, width, nd, nh, nw);
                         float q_value = get_pixel<float>(img, depth, height, width, nd, nh, nw);
-                        float delta_d = local_dis_f[i] * abs(p_value - q_value);
+                        float speed = (1.0 - lambda) + lambda/abs(p_value - q_value);
+                        float delta_d = local_dis_f[i] / speed;
                         float temp_dis = q_dis + delta_d;
                         if(temp_dis < p_dis) p_dis = temp_dis;
                     }
@@ -206,9 +210,9 @@ void geodesic3d_raster_scan(const float * img, const unsigned char * seeds, floa
         int dd_b[13] = {-1, -1, -1, -1,  0,  0,  0,  0,  1,  1,  1,  1,  1};
         int dh_b[13] = { 0,  1,  1,  1,  0,  1,  1,  1,  0,  0,  1,  1,  1};
         int dw_b[13] = { 1, -1,  0,  1,  1, -1,  0,  1,  0,  1, -1,  0,  1};
-        int local_dis_b[13] = {1.414, 1.732, 1.414, 1.732, 1.0,
-                               1.414, 1.000, 1.414, 1.000,
-                               1.414, 1.732, 1.414, 1.732};
+        int local_dis_b[13] = {sqrt2, sqrt3, sqrt2, sqrt3, sqrt1,
+                               sqrt2, sqrt1, sqrt2, sqrt1,
+                               sqrt2, sqrt3, sqrt2, sqrt3};
         // forward pass
         for(int d = depth - 1; d >= 0; d--)
         {
@@ -226,7 +230,8 @@ void geodesic3d_raster_scan(const float * img, const unsigned char * seeds, floa
                         if(nd < 0 || nd >= depth || nh < 0 || nh >= height || nw < 0 || nw >= width) continue;
                         float q_dis = get_pixel<float>(distance, depth, height, width, nd, nh, nw);
                         float q_value = get_pixel<float>(img, depth, height, width, nd, nh, nw);
-                        float delta_d = local_dis_b[i] * abs(p_value - q_value);
+                        float speed = (1.0 - lambda) + lambda/abs(p_value - q_value);
+                        float delta_d = local_dis_b[i] / speed;
                         float temp_dis = q_dis + delta_d;
                         if(temp_dis < p_dis) p_dis = temp_dis;
                     }

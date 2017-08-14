@@ -139,9 +139,10 @@ static PyObject *
 geodesic3d_raster_scan_wrapper(PyObject *self, PyObject *args)
 {
     PyObject *I=NULL, *Seed=NULL;
+    float lambda;
     PyArrayObject *arr_I=NULL, *arr_Seed=NULL;
     
-    if (!PyArg_ParseTuple(args, "OO", &I, &Seed)) return NULL;
+    if (!PyArg_ParseTuple(args, "OOf", &I, &Seed, &lambda)) return NULL;
     
     arr_I = (PyArrayObject*)PyArray_FROM_OTF(I, NPY_FLOAT32, NPY_IN_ARRAY);
     if (arr_I == NULL) return NULL;
@@ -153,17 +154,18 @@ geodesic3d_raster_scan_wrapper(PyObject *self, PyObject *args)
     int nd = PyArray_NDIM(arr_I);   //number of dimensions
     npy_intp * shape = PyArray_DIMS(arr_I);  // npy_intp array of length nd showing length in each dim.
     npy_intp * shape_seed = PyArray_DIMS(arr_Seed);
-    cout<<"input shape: ";
+//    cout<<"lambda = "<<lambda<<endl;
+//    cout<<"input shape: ";
     for(int i=0; i<nd; i++)
     {
-        cout<<shape[i]<<" ";
+//        cout<<shape[i]<<" ";
         if(shape[i]!=shape_seed[i])
         {
             cout<<"input shape does not match"<<endl;
             return NULL;
         }
     }
-    cout<<std::endl;
+//    cout<<std::endl;
     
     int output_shape[3];
     output_shape[0] = shape[0];
@@ -171,7 +173,7 @@ geodesic3d_raster_scan_wrapper(PyObject *self, PyObject *args)
     output_shape[2] = shape[2];
     PyArrayObject * distance = (PyArrayObject*)  PyArray_FromDims(3, output_shape, NPY_FLOAT32);
     geodesic3d_raster_scan((const float *)arr_I->data, (const unsigned char *)arr_Seed->data, (float *) distance->data,
-                        shape[0], shape[1], shape[2]);
+                        shape[0], shape[1], shape[2], lambda);
     
     Py_DECREF(arr_I);
     Py_DECREF(arr_Seed);
