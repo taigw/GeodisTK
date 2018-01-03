@@ -19,6 +19,9 @@ This repository provides a cpp implementation of fast marching and raster scan f
 
 # How to use
 1, build the cpp files with python, run `python setup.py build`
+
 2, install the package to default python path, run `python setup.install`
+
 3, see a 2D example, run `python test2d.py`
+
 4, see a 3D example, run `python test3d.py`
