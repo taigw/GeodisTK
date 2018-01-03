@@ -16,6 +16,7 @@ def test_geodesic_distance2d():
     print "runtime(s) of fast marching {0:}".format(dt1)
     print "runtime(s) of raster  scan  {0:}".format(dt2)
     plt.subplot(1,3,1); plt.imshow(I, cmap='gray')
+    plt.autoscale(False);  plt.plot([100], [100], 'ro')
     plt.axis('off'); plt.title('input image')
     
     plt.subplot(1,3,2); plt.imshow(D1)
