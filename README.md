@@ -12,4 +12,13 @@ DeepIGeoS [4] proposed to combine geodesic distance transforms with convolutiona
 * [4] Wang, Guotai, et al. "Deepigeos: A deep interactive geodesic framework for medical image segmentation." arXiv preprint arXiv:1707.00652 (2017). https://arxiv.org/abs/1707.00652
 
 ![2D example](./data/2d_example.png)
+
 A comparison of fast marching and ranster scan for 2D geodesic distance transform.
+
+This repository provides a cpp implementation of fast marching and raster scan for 2D/3D geodesic distance transforms, and proivdes a python interface to use it. This is part of the work of DeepIGeoS [4]. If you use our code, please cite this paper. 
+
+# How to use
+1, build the cpp files with python, run `python setup.py build`
+2, install the package to default python path, run `python setup.install`
+3, see a 2D example, run `python test2d.py`
+4, see a 3D example, run `python test3d.py`
