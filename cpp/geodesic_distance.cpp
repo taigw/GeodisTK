@@ -184,3 +184,27 @@ static PyMethodDef Methods[] = {
     {"geodesic3d_raster_scan",  geodesic3d_raster_scan_wrapper, METH_VARARGS, "computing 3d geodesic distance"},
     {NULL, NULL, 0, NULL}
 };
+
+
+// for python 3
+//static struct PyModuleDef cGeoDis =
+//{
+//    PyModuleDef_HEAD_INIT,
+//    "geodesic_distance",
+//    "",
+//    -1,
+//    Methods
+//};
+
+//PyMODINIT_FUNC PyInit_geodesic_distance(void){
+//    import_array();
+//    return PyModule_Create(&cGeoDis);
+//}
+
+
+// for python 2
+PyMODINIT_FUNC
+initgeodesic_distance(void) {
+    (void) Py_InitModule("geodesic_distance", Methods);
+    import_array();
+}
