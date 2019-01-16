@@ -4,6 +4,7 @@ import time
 from PIL import Image
 import matplotlib.pyplot as plt
 import nibabel
+import psutil
 
 def load_nifty_volume_as_array(filename):
     # input shape [W, H, D]
@@ -44,31 +45,34 @@ def test_geodesic_distance3d():
     D2 = geodesic_distance_3d(I,S, 1.0, 4)
     dt1 = t1 - t0
     dt2 = time.time() - t1
+    D3 = geodesic_distance_3d(I,S, 0.0, 4)
     print("runtime(s) fast marching {0:}".format(dt1))
     print("runtime(s) raster scan   {0:}".format(dt2))
 
-    D1 = D1*255/D1.max()
-    D1 = np.asarray(D1, np.uint8)
     save_array_as_nifty_volume(D1, "data/image3d_dis1.nii")
-
-    D2 = D2*255/D2.max()
-    D2 = np.asarray(D2, np.uint8)
     save_array_as_nifty_volume(D2, "data/image3d_dis2.nii")
+    save_array_as_nifty_volume(D2, "data/image3d_dis3.nii")
     
     I = I*255/I.max()
     I = np.asarray(I, np.uint8)
     save_array_as_nifty_volume(I, "data/image3d_sub.nii")
 
-    I_slice = I[10]; D1_slice = D1[10]; D2_slice = D2[10]
-    plt.subplot(1,3,1); plt.imshow(I_slice, cmap='gray')
+    I_slice = I[10]
+    D1_slice = D1[10] 
+    D2_slice = D2[10]
+    D3_slice = D3[10]
+    plt.subplot(1,4,1); plt.imshow(I_slice, cmap='gray')
     plt.autoscale(False);  plt.plot([70], [60], 'ro')
     plt.axis('off'); plt.title('input image')
     
-    plt.subplot(1,3,2); plt.imshow(D1_slice)
+    plt.subplot(1,4,2); plt.imshow(D1_slice)
     plt.axis('off'); plt.title('fast marching')
     
-    plt.subplot(1,3,3); plt.imshow(D2_slice)
+    plt.subplot(1,4,3); plt.imshow(D2_slice)
     plt.axis('off'); plt.title('ranster scan')
+
+    plt.subplot(1,4,4); plt.imshow(D3_slice)
+    plt.axis('off'); plt.title('Euclidean distance')
     plt.show()
 
 if __name__ == '__main__':

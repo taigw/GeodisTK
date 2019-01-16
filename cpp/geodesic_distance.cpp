@@ -45,7 +45,7 @@ geodesic2d_fast_marching_wrapper(PyObject *self, PyObject *args)
     
     Py_DECREF(arr_I);
     Py_DECREF(arr_Seed);
-    Py_INCREF(distance);
+    //Py_INCREF(distance);
     return PyArray_Return(distance);
 }
 
@@ -53,9 +53,10 @@ static PyObject *
 geodesic2d_raster_scan_wrapper(PyObject *self, PyObject *args)
 {
     PyObject *I=NULL, *Seed=NULL;
+	float lambda, iteration;
     PyArrayObject *arr_I=NULL, *arr_Seed=NULL;
     
-    if (!PyArg_ParseTuple(args, "OO", &I, &Seed)) return NULL;
+    if (!PyArg_ParseTuple(args, "OOff", &I, &Seed, &lambda, &iteration)) return NULL;
     
     arr_I = (PyArrayObject*)PyArray_FROM_OTF(I, NPY_FLOAT32, NPY_IN_ARRAY);
     if (arr_I == NULL) return NULL;
@@ -83,11 +84,12 @@ geodesic2d_raster_scan_wrapper(PyObject *self, PyObject *args)
     output_shape[0] = shape[0];
     output_shape[1] = shape[1];
     PyArrayObject * distance = (PyArrayObject*)  PyArray_FromDims(2, output_shape, NPY_FLOAT32);
-    geodesic2d_raster_scan((const float *)arr_I->data, (const unsigned char *)arr_Seed->data, (float *) distance->data, shape[0], shape[1]);
+    geodesic2d_raster_scan((const float *)arr_I->data, (const unsigned char *)arr_Seed->data, 
+		(float *) distance->data, shape[0], shape[1], lambda, (int)iteration);
     
     Py_DECREF(arr_I);
     Py_DECREF(arr_Seed);
-    Py_INCREF(distance);
+    //Py_INCREF(distance);
     return PyArray_Return(distance);
 }
 
@@ -131,7 +133,7 @@ geodesic3d_fast_marching_wrapper(PyObject *self, PyObject *args)
     
     Py_DECREF(arr_I);
     Py_DECREF(arr_Seed);
-    Py_INCREF(distance);
+    //Py_INCREF(distance);
     return PyArray_Return(distance);
 }
 
@@ -173,7 +175,7 @@ geodesic3d_raster_scan_wrapper(PyObject *self, PyObject *args)
     
     Py_DECREF(arr_I);
     Py_DECREF(arr_Seed);
-    Py_INCREF(distance);
+    //Py_INCREF(distance);
     return PyArray_Return(distance);
 }
 

@@ -10,4 +10,5 @@ struct Point2D
 };
 void geodesic2d_fast_marching(const float * img, const unsigned char * seeds, float * distance, int height, int width);
 
-void geodesic2d_raster_scan(const float * img, const unsigned char * seeds, float * distance, int height, int width);
+void geodesic2d_raster_scan(const float * img, const unsigned char * seeds, float * distance, 
+	int height, int width, float lambda, int iteration);

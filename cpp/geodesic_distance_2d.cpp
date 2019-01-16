@@ -138,11 +138,9 @@ void geodesic2d_fast_marching(const float * img, const unsigned char * seeds, fl
     delete [] state;
 }
 
-void geodesic2d_raster_scan(const float * img, const unsigned char * seeds, float * distance, int height, int width)
+void geodesic2d_raster_scan(const float * img, const unsigned char * seeds, float * distance,
+	                        int height, int width, float lambda, int iteration)
 {
-    
-    // point state: 0--acceptd, 1--temporary, 2--far away
-    // get initial accepted set and far away set
     float init_dis;
     unsigned char seed_type;
     for(int h = 0; h < height; h++)
@@ -154,12 +152,12 @@ void geodesic2d_raster_scan(const float * img, const unsigned char * seeds, floa
             set_pixel<float>(distance, height, width, h, w, init_dis);
         }
     }
-    for(int it = 0; it<2; it++)
+    for(int it = 0; it<iteration; it++)
     {
-        // forward scann
+        // forward scan
         int dh_f[4] = {-1, -1, -1, 0};
         int dw_f[4] = {-1, 0, 1, -1};
-        float local_dis_f[4] = {1.414, 1.0, 1.414, 1.0};
+        float local_dis_f[4] = {sqrt(2.0), 1.0, sqrt(2.0), 1.0};
         // forward pass
         for(int h = 0; h < height; h++)
         {
@@ -174,7 +172,8 @@ void geodesic2d_raster_scan(const float * img, const unsigned char * seeds, floa
                     if(nh < 0 || nh >= height || nw < 0 || nw >= width) continue;
                     float q_dis = get_pixel<float>(distance, height, width, nh, nw);
                     float q_value = get_pixel<float>(img, height, width, nh, nw);
-                    float delta_d = local_dis_f[i] * abs(p_value - q_value);
+					float speed = (1.0 - lambda) + lambda / (abs(p_value - q_value) + 1e-5);
+                    float delta_d = local_dis_f[i] /speed;
                     float temp_dis = q_dis + delta_d;
                     if(temp_dis < p_dis) p_dis = temp_dis;
                 }
@@ -185,7 +184,7 @@ void geodesic2d_raster_scan(const float * img, const unsigned char * seeds, floa
         // backward scann
         int dh_b[4] = {0, 1, 1, 1};
         int dw_b[4] = {1, -1, 0, 1};
-        float local_dis_b[4] = {1.0, 1.414, 1.0, 1.414};
+        float local_dis_b[4] = {1.0, sqrt(2.0), 1.0, sqrt(2.0)};
         for(int h = height -1; h >= 0; h--)
         {
             for (int w = width - 1; w >= 0; w--)
@@ -199,7 +198,8 @@ void geodesic2d_raster_scan(const float * img, const unsigned char * seeds, floa
                     if(nh < 0 || nh >= height || nw < 0 || nw >= width) continue;
                     float q_dis = get_pixel<float>(distance, height, width, nh, nw);
                     float q_value = get_pixel<float>(img, height, width, nh, nw);
-                    float delta_d = local_dis_b[i] * abs(p_value - q_value);
+					float speed = (1.0 - lambda) + lambda / (abs(p_value - q_value) + 1e-5);
+                    float delta_d = local_dis_b[i] / speed;
                     float temp_dis = q_dis + delta_d;
                     if(temp_dis < p_dis) p_dis = temp_dis;
                 }
