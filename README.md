@@ -14,9 +14,10 @@ DeepIGeoS [5] proposed to combine geodesic distance transforms with convolutiona
 
 ![2D example](./data/2d_example.png)
 
-A comparison of fast marching and ranster scan for 2D geodesic distance transform.
+A comparison of fast marching and ranster scan for 2D geodesic distance transform. (d) shows the Euclidean distance and (e) is a mixture of Geodesic and Euclidean distance.
 
-This repository provides a cpp implementation of fast marching and raster scan for 2D/3D geodesic distance transforms, and proivdes a python interface to use it. This is part of the work of DeepIGeoS [5]. If you use our code, please cite this paper. https://ieeexplore.ieee.org/document/8370732
+This repository provides a cpp implementation of fast marching and raster scan for 2D/3D geodesic and
+Euclidean distance transforms and a mixture of them, and proivdes a python interface to use it. This is part of the work of DeepIGeoS [5]. If you use our code, please cite this paper. https://ieeexplore.ieee.org/document/8370732
 
 
 # How to use
