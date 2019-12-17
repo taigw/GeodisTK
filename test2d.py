@@ -15,12 +15,12 @@ def geodesic_distance_2d(I, S, lamb, iter):
           if lamb==1.0, the distance is based on gradient only without using spatial distance
     iter: number of iteration for raster scanning.
     '''
-    return geodesic_distance.geodesic2d_raster_scan(I,S, lamb, iter)
+    return geodesic_distance.geodesic2d_raster_scan(I, S, lamb, iter)
 
-def test_geodesic_distance2d():
-    I = np.asarray(Image.open('data/img2d.png').convert('L'), np.float32)
-    S = np.zeros_like(I, np.uint8)
-    S[100][100] = 1
+def test_geodesic_distance2d(img, seed_pos):
+    I = np.asanyarray(img, np.float32)
+    S = np.zeros((I.shape[0], I.shape[1]), np.uint8)
+    S[seed_pos[0]][seed_pos[1]] = 1
     t0 = time.time()
     D1 = geodesic_distance.geodesic2d_fast_marching(I,S)
     t1 = time.time()
@@ -33,8 +33,8 @@ def test_geodesic_distance2d():
     print("runtime(s) of raster  scan  {0:}".format(dt2))
 
     plt.figure(figsize=(15,5))
-    plt.subplot(1,5,1); plt.imshow(I, cmap='gray')
-    plt.autoscale(False);  plt.plot([100], [100], 'ro')
+    plt.subplot(1,5,1); plt.imshow(img)
+    plt.autoscale(False);  plt.plot([seed_pos[0]], [seed_pos[1]], 'ro')
     plt.axis('off'); plt.title('(a) input image \n with a seed point')
     
     plt.subplot(1,5,2); plt.imshow(D1)
@@ -50,5 +50,16 @@ def test_geodesic_distance2d():
     plt.axis('off'); plt.title('(e) Mexture of Geodesic \n and Euclidean distance')
     plt.show()
 
+def test_geodesic_distance2d_gray_scale_image():
+    img = Image.open('data/img2d.png').convert('L')
+    seed_position = [100, 100]
+    test_geodesic_distance2d(img, seed_position)
+
+def test_geodesic_distance2d_RGB_image():
+    img = Image.open('data/ISIC_546.jpg')
+    seed_position = [128, 128]
+    test_geodesic_distance2d(img, seed_position)
+
 if __name__ == '__main__':
-    test_geodesic_distance2d()
+    test_geodesic_distance2d_gray_scale_image()
+    # test_geodesic_distance2d_RGB_image()

@@ -10,7 +10,7 @@ struct Point3D
     int h;
 };
 void geodesic3d_fast_marching(const float * img, const unsigned char * seeds, float * distance,
-                         int depth, int height, int width);
+                         int depth, int height, int width, int channel);
 
 void geodesic3d_raster_scan(const float * img, const unsigned char * seeds, float * distance,
-                              int depth, int height, int width, float lambda, int iteration);
+                              int depth, int height, int width, int channel, float lambda, int iteration);

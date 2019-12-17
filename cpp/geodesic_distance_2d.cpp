@@ -6,6 +6,17 @@
 #include "geodesic_distance_2d.h"
 using namespace std;
 
+float get_l2_distance(std::vector<float> p1, std::vector<float> p2)
+{
+    float sq_sum = 0.0;
+    for(int d = 0; d < p1.size(); d++)
+    {
+        sq_sum = sq_sum + (p1[d] - p2[d]) * (p1[d] - p2[d]);
+    }
+    float dis = sqrt(sq_sum);
+    return dis;
+}
+
 void insert_point_to_list(std::vector<Point2D> * list, int start_position,  Point2D p)
 {
     int insert_idx = list->size();
@@ -35,14 +46,16 @@ void update_point_in_list(std::vector<Point2D> * list, Point2D p)
     insert_point_to_list(list, remove_idx, p);
 }
 
-void add_new_accepted_point(const float * img, float * distance, int * state, std::vector<Point2D> * list, int height, int width, Point2D p)
+void add_new_accepted_point(const float * img, float * distance, int * state, 
+    std::vector<Point2D> * list, int height, int width, int channel, Point2D p)
 {
     int w = p.w;
     int h = p.h;
     int nh, nw, temp_state;
-    float p_value, q_value;
+    std::vector<float> p_value, q_value;
     float p_dis, space_dis, delta_dis, old_dis, new_dis;
-    p_value = get_pixel<float>(img, height, width, h, w);
+
+    p_value = get_pixel_vector(img, height, width, channel, h, w); 
     p_dis   = get_pixel<float>(distance, height, width, h, w);
     for(int dh = -1; dh <= 1; dh++)
     {
@@ -56,8 +69,8 @@ void add_new_accepted_point(const float * img, float * distance, int * state, st
                 temp_state = get_pixel<int>(state, height, width, nh, nw);
                 if(temp_state == 0) continue;
                 space_dis = sqrt(dw*dw + dh*dh);
-                q_value   = get_pixel<float>(img, height, width, nh, nw);
-                delta_dis = space_dis*abs(p_value - q_value);
+                q_value   = get_pixel_vector(img, height, width, channel, nh, nw); 
+                delta_dis = space_dis*get_l2_distance(p_value, q_value);
                 old_dis   = get_pixel<float>(distance, height, width, nh, nw);
                 
                 new_dis   = p_dis + delta_dis;
@@ -81,7 +94,8 @@ void add_new_accepted_point(const float * img, float * distance, int * state, st
     } // end for dh
 }
 
-void geodesic2d_fast_marching(const float * img, const unsigned char * seeds, float * distance, int height, int width)
+void geodesic2d_fast_marching(const float * img, const unsigned char * seeds, float * distance, 
+                              int height, int width, int channel)
 {
     int * state = new int[width * height];
     
@@ -123,7 +137,7 @@ void geodesic2d_fast_marching(const float * img, const unsigned char * seeds, fl
                 accepted_p.distance = 0.0;
                 accepted_p.h = h;
                 accepted_p.w = w;
-                add_new_accepted_point(img, distance, state, &temporary_list, height, width, accepted_p);
+                add_new_accepted_point(img, distance, state, &temporary_list, height, width, channel, accepted_p);
              }
         }
     }
@@ -133,13 +147,13 @@ void geodesic2d_fast_marching(const float * img, const unsigned char * seeds, fl
         Point2D temp_point = temporary_list[temporary_list.size() - 1];
         temporary_list.pop_back();
         set_pixel<int>(state, height, width, temp_point.h, temp_point.w, 0);
-        add_new_accepted_point(img, distance, state, &temporary_list, height, width, temp_point);
+        add_new_accepted_point(img, distance, state, &temporary_list, height, width, channel, temp_point);
     }
     delete [] state;
 }
 
 void geodesic2d_raster_scan(const float * img, const unsigned char * seeds, float * distance,
-	                        int height, int width, float lambda, int iteration)
+	                        int height, int width, int channel, float lambda, int iteration)
 {
     float init_dis;
     unsigned char seed_type;
@@ -164,15 +178,16 @@ void geodesic2d_raster_scan(const float * img, const unsigned char * seeds, floa
             for (int w = 0; w < width; w++)
             {
                 float p_dis = get_pixel<float>(distance, height, width, h, w);
-                float p_value = get_pixel<float>(img, height, width, h, w);
+                std::vector<float> p_value = get_pixel_vector(img, height, width, channel, h, w);
                 for(int i = 0; i < 4; i++)
                 {
                     int nh = h + dh_f[i];
                     int nw = w + dw_f[i];
                     if(nh < 0 || nh >= height || nw < 0 || nw >= width) continue;
                     float q_dis = get_pixel<float>(distance, height, width, nh, nw);
-                    float q_value = get_pixel<float>(img, height, width, nh, nw);
-					float speed = (1.0 - lambda) + lambda / (abs(p_value - q_value) + 1e-5);
+                    std::vector<float> q_value = get_pixel_vector(img, height, width, channel, nh, nw);;
+                    float l2dis = get_l2_distance(p_value, q_value);
+					float speed = (1.0 - lambda) + lambda / (l2dis + 1e-5);
                     float delta_d = local_dis_f[i] /speed;
                     float temp_dis = q_dis + delta_d;
                     if(temp_dis < p_dis) p_dis = temp_dis;
@@ -190,15 +205,16 @@ void geodesic2d_raster_scan(const float * img, const unsigned char * seeds, floa
             for (int w = width - 1; w >= 0; w--)
             {
                 float p_dis = get_pixel<float>(distance, height, width, h, w);
-                float p_value = get_pixel<float>(img, height, width, h, w);
+                std::vector<float> p_value = get_pixel_vector(img, height, width, channel, h, w);
                 for(int i = 0; i < 4; i++)
                 {
                     int nh = h + dh_b[i];
                     int nw = w + dw_b[i];
                     if(nh < 0 || nh >= height || nw < 0 || nw >= width) continue;
                     float q_dis = get_pixel<float>(distance, height, width, nh, nw);
-                    float q_value = get_pixel<float>(img, height, width, nh, nw);
-					float speed = (1.0 - lambda) + lambda / (abs(p_value - q_value) + 1e-5);
+                    std::vector<float> q_value = get_pixel_vector(img, height, width, channel, nh, nw);
+                    float l2dis = get_l2_distance(p_value, q_value);
+					float speed = (1.0 - lambda) + lambda / (l2dis + 1e-5);
                     float delta_d = local_dis_b[i] / speed;
                     float temp_dis = q_dis + delta_d;
                     if(temp_dis < p_dis) p_dis = temp_dis;

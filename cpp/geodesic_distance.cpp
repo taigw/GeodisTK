@@ -1,4 +1,5 @@
 #include <Python.h>
+#include <assert.h>
 #include "numpy/arrayobject.h"
 #include "geodesic_distance_2d.h"
 #include "geodesic_distance_3d.h"
@@ -25,23 +26,29 @@ geodesic2d_fast_marching_wrapper(PyObject *self, PyObject *args)
     int nd = PyArray_NDIM(arr_I);   //number of dimensions
     npy_intp * shape = PyArray_DIMS(arr_I);  // npy_intp array of length nd showing length in each dim.
     npy_intp * shape_seed = PyArray_DIMS(arr_Seed);
-    cout<<"input shape: ";
+    cout<<"input shape ";
     for(int i=0; i<nd; i++)
     {
         cout<<shape[i]<<" ";
-        if(shape[i]!=shape_seed[i])
+        if(i < 2 && shape[i]!=shape_seed[i])
         {
             cout<<"input shape does not match"<<endl;
             return NULL;
         }
     }
     cout<<std::endl;
-    
+    int channel = 1;
+    if(nd == 3){
+        channel = shape[2];
+    }
+       
     int output_shape[2];
     output_shape[0] = shape[0];
     output_shape[1] = shape[1];
+
     PyArrayObject * distance = (PyArrayObject*)  PyArray_FromDims(2, output_shape, NPY_FLOAT32);
-    geodesic2d_fast_marching((const float *)arr_I->data, (const unsigned char *)arr_Seed->data, (float *) distance->data, shape[0], shape[1]);
+    geodesic2d_fast_marching((const float *)arr_I->data, (const unsigned char *)arr_Seed->data, 
+           (float *) distance->data, shape[0], shape[1], channel);
     
     Py_DECREF(arr_I);
     Py_DECREF(arr_Seed);
@@ -68,24 +75,29 @@ geodesic2d_raster_scan_wrapper(PyObject *self, PyObject *args)
     int nd = PyArray_NDIM(arr_I);   //number of dimensions
     npy_intp * shape = PyArray_DIMS(arr_I);  // npy_intp array of length nd showing length in each dim.
     npy_intp * shape_seed = PyArray_DIMS(arr_Seed);
-    cout<<"input shape: ";
+    cout<<"input shape ";
     for(int i=0; i<nd; i++)
     {
         cout<<shape[i]<<" ";
-        if(shape[i]!=shape_seed[i])
+        if(i < 2 && shape[i]!=shape_seed[i])
         {
             cout<<"input shape does not match"<<endl;
             return NULL;
         }
     }
     cout<<std::endl;
-    
+    int channel = 1;
+    if(nd == 3){
+        channel = shape[2];
+    }
+
     int output_shape[2];
     output_shape[0] = shape[0];
     output_shape[1] = shape[1];
+
     PyArrayObject * distance = (PyArrayObject*)  PyArray_FromDims(2, output_shape, NPY_FLOAT32);
     geodesic2d_raster_scan((const float *)arr_I->data, (const unsigned char *)arr_Seed->data, 
-		(float *) distance->data, shape[0], shape[1], lambda, (int)iteration);
+            (float *) distance->data, shape[0], shape[1], channel, lambda, (int)iteration);
     
     Py_DECREF(arr_I);
     Py_DECREF(arr_Seed);
@@ -111,25 +123,29 @@ geodesic3d_fast_marching_wrapper(PyObject *self, PyObject *args)
     int nd = PyArray_NDIM(arr_I);   //number of dimensions
     npy_intp * shape = PyArray_DIMS(arr_I);  // npy_intp array of length nd showing length in each dim.
     npy_intp * shape_seed = PyArray_DIMS(arr_Seed);
-    cout<<"input shape: ";
+    cout<<"input shape ";
     for(int i=0; i<nd; i++)
     {
         cout<<shape[i]<<" ";
-        if(shape[i]!=shape_seed[i])
+        if(i < 3 && shape[i]!=shape_seed[i])
         {
             cout<<"input shape does not match"<<endl;
             return NULL;
         }
     }
     cout<<std::endl;
-    
+    int channel = 1;
+    if(nd == 4){
+        channel = shape[3];
+    }
     int output_shape[3];
     output_shape[0] = shape[0];
     output_shape[1] = shape[1];
     output_shape[2] = shape[2];
+
     PyArrayObject * distance = (PyArrayObject*)  PyArray_FromDims(3, output_shape, NPY_FLOAT32);
     geodesic3d_fast_marching((const float *)arr_I->data, (const unsigned char *)arr_Seed->data, (float *) distance->data,
-                        shape[0], shape[1], shape[2]);
+                        shape[0], shape[1], shape[2], channel);
     
     Py_DECREF(arr_I);
     Py_DECREF(arr_Seed);
@@ -156,22 +172,29 @@ geodesic3d_raster_scan_wrapper(PyObject *self, PyObject *args)
     int nd = PyArray_NDIM(arr_I);   //number of dimensions
     npy_intp * shape = PyArray_DIMS(arr_I);  // npy_intp array of length nd showing length in each dim.
     npy_intp * shape_seed = PyArray_DIMS(arr_Seed);
+    cout<<"input shape ";
     for(int i=0; i<nd; i++)
     {
-        if(shape[i]!=shape_seed[i])
+        cout<<shape[i]<<" ";
+        if(i < 3 && shape[i]!=shape_seed[i])
         {
             cout<<"input shape does not match"<<endl;
             return NULL;
         }
     }
-    
+    cout<<std::endl;
+    int channel = 1;
+    if(nd == 4){
+        channel = shape[3];
+    }
     int output_shape[3];
     output_shape[0] = shape[0];
     output_shape[1] = shape[1];
     output_shape[2] = shape[2];
+
     PyArrayObject * distance = (PyArrayObject*)  PyArray_FromDims(3, output_shape, NPY_FLOAT32);
     geodesic3d_raster_scan((const float *)arr_I->data, (const unsigned char *)arr_Seed->data, (float *) distance->data,
-                        shape[0], shape[1], shape[2], lambda, (int) iteration);
+                        shape[0], shape[1], shape[2], channel, lambda, (int) iteration);
     
     Py_DECREF(arr_I);
     Py_DECREF(arr_Seed);
