@@ -1,4 +1,4 @@
-import geodesic_distance
+import GeodisTK
 import numpy as np
 import time
 from PIL import Image
@@ -15,14 +15,14 @@ def geodesic_distance_2d(I, S, lamb, iter):
           if lamb==1.0, the distance is based on gradient only without using spatial distance
     iter: number of iteration for raster scanning.
     '''
-    return geodesic_distance.geodesic2d_raster_scan(I, S, lamb, iter)
+    return GeodisTK.geodesic2d_raster_scan(I, S, lamb, iter)
 
 def test_geodesic_distance2d(img, seed_pos):
     I = np.asanyarray(img, np.float32)
     S = np.zeros((I.shape[0], I.shape[1]), np.uint8)
     S[seed_pos[0]][seed_pos[1]] = 1
     t0 = time.time()
-    D1 = geodesic_distance.geodesic2d_fast_marching(I,S)
+    D1 = GeodisTK.geodesic2d_fast_marching(I,S)
     t1 = time.time()
     D2 = geodesic_distance_2d(I, S, 1.0, 2)
     dt1 = t1 - t0

@@ -4,8 +4,8 @@ import setuptools
 from distutils.core import setup
 from distutils.extension import Extension
 
-package_name = 'geodisTK'
-module_name  = 'geodesic_distance'
+package_name = 'GeodisTK'
+module_name  = 'GeodisTK'
 version      = sys.version[0]
 wrap_source  = './cpp/wrap_py{0:}.cpp'.format(version)
 module1      = Extension(module_name,

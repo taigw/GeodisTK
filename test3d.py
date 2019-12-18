@@ -1,4 +1,4 @@
-import geodesic_distance
+import GeodisTK
 import numpy as np
 import time
 from PIL import Image
@@ -31,7 +31,7 @@ def geodesic_distance_3d(I, S, lamb, iter):
           if lamb==1.0, the distance is based on gradient only without using spatial distance
     iter: number of iteration for raster scanning.
     '''
-    return geodesic_distance.geodesic3d_raster_scan(I,S, lamb, iter)
+    return GeodisTK.geodesic3d_raster_scan(I,S, lamb, iter)
 
 def test_geodesic_distance3d():
     I = load_nifty_volume_as_array("data/img3d.nii")
@@ -40,7 +40,7 @@ def test_geodesic_distance3d():
     S = np.zeros_like(I, np.uint8)
     S[10][60][70] = 1
     t0 = time.time()
-    D1 = geodesic_distance.geodesic3d_fast_marching(I,S)
+    D1 = GeodisTK.geodesic3d_fast_marching(I,S)
     t1 = time.time()
     D2 = geodesic_distance_3d(I,S, 1.0, 4)
     dt1 = t1 - t0
