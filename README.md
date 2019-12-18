@@ -20,11 +20,13 @@ This repository provides a cpp implementation of fast marching and raster scan f
 Euclidean distance transforms and a mixture of them, and proivdes a python interface to use it. This is part of the work of DeepIGeoS [5]. If you use our code, please cite this paper. https://ieeexplore.ieee.org/document/8370732
 
 
+# How to install
+1, Install this toolkit easily by typing `pip install geodisTK`
+
+2, Alternatively, if you want to build from source files, download this package and run `python setup.py build` to 
+build the cpp files, then run `python setup.py install` to install the package to default python path.
+
 # How to use
-1, build the cpp files with python, run `python setup.py build`
+1, see a 2D example, run `python test2d.py`
 
-2, install the package to default python path, run `python setup.py install`
-
-3, see a 2D example, run `python test2d.py`
-
-4, see a 3D example, run `python test3d.py`
+2, see a 3D example, run `python test3d.py`

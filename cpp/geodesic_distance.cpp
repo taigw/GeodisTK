@@ -41,7 +41,7 @@ geodesic2d_fast_marching_wrapper(PyObject *self, PyObject *args)
     if(nd == 3){
         channel = shape[2];
     }
-       
+
     int output_shape[2];
     output_shape[0] = shape[0];
     output_shape[1] = shape[1];
