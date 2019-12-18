@@ -1,4 +1,4 @@
-# Implementation of 2D/3D geodesic distance transforms
+# GeodisTK: Geodesic Distance Transform Toolkit for 2D and 3D Images
 Geodesic transformation of images can be implementated with two approaches: fast marching and raster scan. Fast marching is based on the iterative propagation of a pixel front with velocity F [1]. Raster scan is based on kernel operations that are sequentially applied over the image in multiple passes [2][3]. In GeoS [4], the authors proposed to use a 3x3 kernel for forward and backward passes for efficient geodesic distance transform, which was used for image segmentation. 
 
 ![ranster scan](./data/ranster_scan.png)
@@ -16,12 +16,12 @@ DeepIGeoS [5] proposed to combine geodesic distance transforms with convolutiona
 
 A comparison of fast marching and ranster scan for 2D geodesic distance transform. (d) shows the Euclidean distance and (e) is a mixture of Geodesic and Euclidean distance.
 
-This repository provides a cpp implementation of fast marching and raster scan for 2D/3D geodesic and
+This toolkit provides a cpp implementation of fast marching and raster scan for 2D/3D geodesic and
 Euclidean distance transforms and a mixture of them, and proivdes a python interface to use it. This is part of the work of DeepIGeoS [5]. If you use our code, please cite this paper. https://ieeexplore.ieee.org/document/8370732
 
 
 # How to install
-1, Install this toolkit easily by typing `pip install geodisTK`
+1, Install this toolkit easily by typing `pip install GeodisTK`
 
 2, Alternatively, if you want to build from source files, download this package and run `python setup.py build` to 
 build the cpp files, then run `python setup.py install` to install the package to default python path.
