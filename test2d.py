@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 def geodesic_distance_2d(I, S, lamb, iter):
     '''
     get 2d geodesic disntance by raser scanning.
-    I: input image
-    S: binary image where non-zero pixels are used as seeds
+    I: input image, can have multiple channels. Type should be np.float32.
+    S: binary image where non-zero pixels are used as seeds. Type should be np.uint8.
     lamb: weighting betwween 0.0 and 1.0
           if lamb==0.0, return spatial euclidean distance without considering gradient
           if lamb==1.0, the distance is based on gradient only without using spatial distance
@@ -17,7 +17,7 @@ def geodesic_distance_2d(I, S, lamb, iter):
     '''
     return GeodisTK.geodesic2d_raster_scan(I, S, lamb, iter)
 
-def test_geodesic_distance2d(img, seed_pos):
+def demo_geodesic_distance2d(img, seed_pos):
     I = np.asanyarray(img, np.float32)
     S = np.zeros((I.shape[0], I.shape[1]), np.uint8)
     S[seed_pos[0]][seed_pos[1]] = 1
@@ -50,16 +50,25 @@ def test_geodesic_distance2d(img, seed_pos):
     plt.axis('off'); plt.title('(e) Mexture of Geodesic \n and Euclidean distance')
     plt.show()
 
-def test_geodesic_distance2d_gray_scale_image():
+def demo_geodesic_distance2d_gray_scale_image():
     img = Image.open('data/img2d.png').convert('L')
     seed_position = [100, 100]
-    test_geodesic_distance2d(img, seed_position)
+    demo_geodesic_distance2d(img, seed_position)
 
-def test_geodesic_distance2d_RGB_image():
+def demo_geodesic_distance2d_RGB_image():
     img = Image.open('data/ISIC_546.jpg')
     seed_position = [128, 128]
-    test_geodesic_distance2d(img, seed_position)
+    demo_geodesic_distance2d(img, seed_position)
 
 if __name__ == '__main__':
-    test_geodesic_distance2d_gray_scale_image()
-    # test_geodesic_distance2d_RGB_image()
+    print("example list")
+    print(" 0 -- example for gray scale image")
+    print(" 1 -- example for RB image")
+    print("please enter the index of an example:")
+    method = input()
+    if(method == '0'):
+        demo_geodesic_distance2d_gray_scale_image()
+    elif(method == '1'):
+        demo_geodesic_distance2d_RGB_image()
+    else:
+        print("invalid number : {0:}".format(method))

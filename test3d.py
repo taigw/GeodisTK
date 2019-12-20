@@ -24,8 +24,8 @@ def save_array_as_nifty_volume(data, filename):
 def geodesic_distance_3d(I, S, lamb, iter):
     '''
     get 3d geodesic disntance by raser scanning.
-    I: input image
-    S: binary image where non-zero pixels are used as seeds
+    I: input image, can have multiple channels. Type should be np.float32.
+    S: binary image where non-zero pixels are used as seeds. Type should be np.uint8.
     lamb: weighting betwween 0.0 and 1.0
           if lamb==0.0, return spatial euclidean distance without considering gradient
           if lamb==1.0, the distance is based on gradient only without using spatial distance
