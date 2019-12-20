@@ -66,6 +66,7 @@ if __name__ == '__main__':
     print(" 1 -- example for RB image")
     print("please enter the index of an example:")
     method = input()
+    method = '{0:}'.format(method)
     if(method == '0'):
         demo_geodesic_distance2d_gray_scale_image()
     elif(method == '1'):

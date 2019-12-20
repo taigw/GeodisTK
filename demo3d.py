@@ -33,7 +33,7 @@ def geodesic_distance_3d(I, S, lamb, iter):
     '''
     return GeodisTK.geodesic3d_raster_scan(I,S, lamb, iter)
 
-def test_geodesic_distance3d():
+def demo_geodesic_distance3d():
     I = load_nifty_volume_as_array("data/img3d.nii")
     I = np.asarray(I, np.float32)
     I = I[18:38, 63:183, 93:233 ]
@@ -76,4 +76,4 @@ def test_geodesic_distance3d():
     plt.show()
 
 if __name__ == '__main__':
-    test_geodesic_distance3d()
+    demo_geodesic_distance3d()

@@ -21,8 +21,13 @@ description = 'An open-source toolkit to calculate geodesic distance' + \
               ' for 2D and 3D images'
 
 # Get the long description
-with open('README.md', encoding='utf-8') as f:
-    long_description = f.read()
+if(sys.version[0] == '2'):
+    import io
+    with io.open('README.md', 'r', encoding='utf-8') as f:
+        long_description = f.read()
+else:
+    with open('README.md', encoding='utf-8') as f:
+        long_description = f.read()
 
 setup(
     name    = package_name,
