@@ -21,12 +21,13 @@ Euclidean distance transforms and a mixture of them, and proivdes a python inter
 
 
 ### How to install
-1. Install this toolkit easily by typing `pip install GeodisTK`
+1. Install this toolkit easily by typing [`pip install GeodisTK`](https://pypi.org/project/GeodisTK/)
 
 2. Alternatively, if you want to build from source files, download this package and run the following:
 ```bash
 python setup.py build
 python setup.py install
+```
 
 ### How to use
 1. See a 2D example, run `python demo2d.py`
