@@ -42,11 +42,11 @@ geodesic2d_fast_marching_wrapper(PyObject *self, PyObject *args)
         channel = shape[2];
     }
 
-    int output_shape[2];
+    npy_intp output_shape[2];
     output_shape[0] = shape[0];
     output_shape[1] = shape[1];
 
-    PyArrayObject * distance = (PyArrayObject*)  PyArray_FromDims(2, output_shape, NPY_FLOAT32);
+    PyArrayObject * distance = (PyArrayObject*)  PyArray_SimpleNew(2, output_shape, NPY_FLOAT32);
     geodesic2d_fast_marching((const float *)arr_I->data, (const unsigned char *)arr_Seed->data, 
            (float *) distance->data, shape[0], shape[1], channel);
     
@@ -91,11 +91,11 @@ geodesic2d_raster_scan_wrapper(PyObject *self, PyObject *args)
         channel = shape[2];
     }
 
-    int output_shape[2];
+    npy_intp output_shape[2];
     output_shape[0] = shape[0];
     output_shape[1] = shape[1];
 
-    PyArrayObject * distance = (PyArrayObject*)  PyArray_FromDims(2, output_shape, NPY_FLOAT32);
+    PyArrayObject * distance = (PyArrayObject*)  PyArray_SimpleNew(2, output_shape, NPY_FLOAT32);
     geodesic2d_raster_scan((const float *)arr_I->data, (const unsigned char *)arr_Seed->data, 
             (float *) distance->data, shape[0], shape[1], channel, lambda, (int)iteration);
     
@@ -140,7 +140,7 @@ geodesic3d_fast_marching_wrapper(PyObject *self, PyObject *args)
     if(nd == 4){
         channel = shape[3];
     }
-    int output_shape[3];
+    npy_intp output_shape[3];
     output_shape[0] = shape[0];
     output_shape[1] = shape[1];
     output_shape[2] = shape[2];
@@ -152,7 +152,7 @@ geodesic3d_fast_marching_wrapper(PyObject *self, PyObject *args)
         sp_vec[i] = sp[i];
     }
 
-    PyArrayObject * distance = (PyArrayObject*)  PyArray_FromDims(3, output_shape, NPY_FLOAT32);
+    PyArrayObject * distance = (PyArrayObject*)  PyArray_SimpleNew(3, output_shape, NPY_FLOAT32);
     geodesic3d_fast_marching((const float *)arr_I->data, (const unsigned char *)arr_Seed->data, (float *) distance->data,
                         shape[0], shape[1], shape[2], channel, sp_vec);
     
