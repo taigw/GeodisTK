@@ -31,13 +31,13 @@ else:
 
 setup(
     name    = package_name,
-    version = "0.1.5.2",
+    version = "0.1.6",
     author  ='Guotai Wang',
     author_email = 'wguotai@gmail.com',
     description  = description,
     long_description = long_description,
     long_description_content_type = 'text/markdown',
-    url      = 'https://github.com/taigw/geodesic_distance',
+    url      = 'https://github.com/taigw/GeodisTK',
     license  = 'MIT',
     packages = setuptools.find_packages(),
     ext_modules = [module1],
@@ -50,5 +50,5 @@ setup(
     python_requires = '>=3.6',
 )
 
-# to build, run python stup.py build or python setup.py build_ext --inplace
+# to build, run python setup.py build or python setup.py build_ext --inplace
 # to install, run python setup.py install

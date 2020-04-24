@@ -108,10 +108,10 @@ geodesic2d_raster_scan_wrapper(PyObject *self, PyObject *args)
 static PyObject *
 geodesic3d_fast_marching_wrapper(PyObject *self, PyObject *args)
 {
-    PyObject *I=NULL, *Seed=NULL;
-    PyArrayObject *arr_I=NULL, *arr_Seed=NULL;
+    PyObject *I=NULL, *Seed=NULL,  *Spacing=NULL;
+    PyArrayObject *arr_I=NULL, *arr_Seed=NULL, *arr_Space=NULL;
     
-    if (!PyArg_ParseTuple(args, "OO", &I, &Seed)) return NULL;
+    if (!PyArg_ParseTuple(args, "OOO", &I, &Seed, &Spacing)) return NULL;
     
     arr_I = (PyArrayObject*)PyArray_FROM_OTF(I, NPY_FLOAT32, NPY_IN_ARRAY);
     if (arr_I == NULL) return NULL;
@@ -119,6 +119,8 @@ geodesic3d_fast_marching_wrapper(PyObject *self, PyObject *args)
     arr_Seed = (PyArrayObject*)PyArray_FROM_OTF(Seed, NPY_UINT8, NPY_IN_ARRAY);
     if (arr_Seed == NULL) return NULL;
     
+    arr_Space = (PyArrayObject*)PyArray_FROM_OTF(Spacing, NPY_FLOAT32, NPY_IN_ARRAY);
+    if (arr_Space == NULL) return NULL;
     
     int nd = PyArray_NDIM(arr_I);   //number of dimensions
     npy_intp * shape = PyArray_DIMS(arr_I);  // npy_intp array of length nd showing length in each dim.
@@ -143,9 +145,16 @@ geodesic3d_fast_marching_wrapper(PyObject *self, PyObject *args)
     output_shape[1] = shape[1];
     output_shape[2] = shape[2];
 
+    const float * sp = (const float *)arr_Space->data;
+    cout<<"spacing: "<<sp[0]<<" "<<sp[1]<<" "<<sp[2]<<endl;
+    std::vector<float> sp_vec(3);
+    for(int i = 0; i<3; i++){
+        sp_vec[i] = sp[i];
+    }
+
     PyArrayObject * distance = (PyArrayObject*)  PyArray_FromDims(3, output_shape, NPY_FLOAT32);
     geodesic3d_fast_marching((const float *)arr_I->data, (const unsigned char *)arr_Seed->data, (float *) distance->data,
-                        shape[0], shape[1], shape[2], channel);
+                        shape[0], shape[1], shape[2], channel, sp_vec);
     
     Py_DECREF(arr_I);
     Py_DECREF(arr_Seed);
@@ -156,19 +165,22 @@ geodesic3d_fast_marching_wrapper(PyObject *self, PyObject *args)
 static PyObject *
 geodesic3d_raster_scan_wrapper(PyObject *self, PyObject *args)
 {
-    PyObject *I=NULL, *Seed=NULL;
+    PyObject *I=NULL, *Seed=NULL, *Spacing=NULL;
     float lambda, iteration;
-    PyArrayObject *arr_I=NULL, *arr_Seed=NULL;
+
+    PyArrayObject *arr_I=NULL, *arr_Seed=NULL, *arr_Space=NULL;
     
-    if (!PyArg_ParseTuple(args, "OOff", &I, &Seed, &lambda, &iteration)) return NULL;
+    if (!PyArg_ParseTuple(args, "OOOff", &I, &Seed, &Spacing, &lambda, &iteration)) return NULL;
     
     arr_I = (PyArrayObject*)PyArray_FROM_OTF(I, NPY_FLOAT32, NPY_IN_ARRAY);
     if (arr_I == NULL) return NULL;
     
     arr_Seed = (PyArrayObject*)PyArray_FROM_OTF(Seed, NPY_UINT8, NPY_IN_ARRAY);
     if (arr_Seed == NULL) return NULL;
-    
-    
+
+    arr_Space = (PyArrayObject*)PyArray_FROM_OTF(Spacing, NPY_FLOAT32, NPY_IN_ARRAY);
+    if (arr_Space == NULL) return NULL;
+        
     int nd = PyArray_NDIM(arr_I);   //number of dimensions
     npy_intp * shape = PyArray_DIMS(arr_I);  // npy_intp array of length nd showing length in each dim.
     npy_intp * shape_seed = PyArray_DIMS(arr_Seed);
@@ -192,9 +204,15 @@ geodesic3d_raster_scan_wrapper(PyObject *self, PyObject *args)
     output_shape[1] = shape[1];
     output_shape[2] = shape[2];
 
+    const float * sp = (const float *)arr_Space->data;
+    cout<<"spacing: "<<sp[0]<<" "<<sp[1]<<" "<<sp[2]<<endl;
+    std::vector<float> sp_vec(3);
+    for(int i = 0; i<3; i++){
+        sp_vec[i] = sp[i];
+    }
     PyArrayObject * distance = (PyArrayObject*)  PyArray_FromDims(3, output_shape, NPY_FLOAT32);
     geodesic3d_raster_scan((const float *)arr_I->data, (const unsigned char *)arr_Seed->data, (float *) distance->data,
-                        shape[0], shape[1], shape[2], channel, lambda, (int) iteration);
+                        shape[0], shape[1], shape[2], channel, sp_vec, lambda, (int) iteration);
     
     Py_DECREF(arr_I);
     Py_DECREF(arr_Seed);

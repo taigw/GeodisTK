@@ -38,7 +38,8 @@ void update_point_in_list(std::vector<Point3D> * list, Point3D p)
 
 void add_new_accepted_point(const float * img, float * distance, int * state,
                             std::vector<Point3D> * list,
-                            int depth, int height, int width, int channel, Point3D p)
+                            int depth, int height, int width, int channel, 
+                            std::vector<float> spacing, Point3D p)
 {
     int d = p.d;
     int h = p.h;
@@ -61,9 +62,12 @@ void add_new_accepted_point(const float * img, float * distance, int * state,
                 {
                     int temp_state = get_pixel<int>(state, depth, height, width, nd, nh, nw);
                     if(temp_state == 0) continue;
-                    float space_dis = sqrt(dd*dd + dh*dh + dw*dw);
+                    float dd_sp = dd * spacing[0];
+                    float dh_sp = dh * spacing[1];
+                    float dw_sp = dw * spacing[2];
+                    float space_dis = sqrt(dd_sp*dd_sp + dh_sp*dh_sp + dw_sp*dw_sp);
                     q_value      = get_pixel_vector(img, depth, height, width, channel, nd, nh, nw); 
-                    float delta_dis = space_dis*get_l2_distance(p_value, q_value);;
+                    float delta_dis = space_dis*get_l2_distance(p_value, q_value);
                     float old_dis   = get_pixel<float>(distance, depth, height, width, nd, nh, nw);
                     
                     float new_dis   = p_dis + delta_dis;
@@ -90,7 +94,7 @@ void add_new_accepted_point(const float * img, float * distance, int * state,
 }
 
 void geodesic3d_fast_marching(const float * img, const unsigned char * seeds, float * distance,
-                         int depth, int height, int width, int channel)
+                         int depth, int height, int width, int channel, std::vector<float> spacing)
 {
     int * state = new int[depth * height * width];
     
@@ -136,7 +140,7 @@ void geodesic3d_fast_marching(const float * img, const unsigned char * seeds, fl
                     accepted_p.d = d;
                     accepted_p.h = h;
                     accepted_p.w = w;
-                    add_new_accepted_point(img, distance, state, &temporary_list, depth, height, width, channel, accepted_p);
+                    add_new_accepted_point(img, distance, state, &temporary_list, depth, height, width, channel, spacing, accepted_p);
                  }
             }
         }
@@ -146,19 +150,21 @@ void geodesic3d_fast_marching(const float * img, const unsigned char * seeds, fl
         Point3D temp_point = temporary_list[temporary_list.size() - 1];
         temporary_list.pop_back();
         set_pixel<int>(state, depth, height, width, temp_point.d, temp_point.h, temp_point.w, 0);
-        add_new_accepted_point(img, distance, state, &temporary_list, depth, height, width, channel, temp_point);
+        add_new_accepted_point(img, distance, state, &temporary_list, depth, height, width, channel, spacing, temp_point);
     }
     delete [] state;
 }
 
 void geodesic3d_raster_scan(const float * img, const unsigned char * seeds, float * distance,
-                              int depth, int height, int width, int channel, float lambda, int iteration)
+                              int depth, int height, int width, int channel, 
+                              std::vector<float> spacing, float lambda, int iteration)
 {
     float init_dis;
     float p_value, q_value;
     std::vector<float> p_value_v, q_value_v;
     float l2dis;
     unsigned char seed_type;
+
     for(int d = 0; d < depth; d++)
     {
         for(int h = 0; h < height; h++)
@@ -171,18 +177,42 @@ void geodesic3d_raster_scan(const float * img, const unsigned char * seeds, floa
             }
         }
     }
-	float sqrt3 = sqrt(3.0);
-	float sqrt2 = sqrt(2.0);
-    float sqrt1 = 1.0;
+	// float sqrt3 = sqrt(3.0);
+	// float sqrt2 = sqrt(2.0);
+    // float sqrt1 = 1.0;
+    // distance for forward pass
+    int dd_f[13] = {-1, -1, -1, -1, -1,  0,  0,  0,  0,  1,  1,  1,  1};
+    int dh_f[13] = {-1, -1, -1,  0,  0, -1, -1, -1,  0, -1, -1, -1,  0};
+    int dw_f[13] = {-1,  0,  1, -1,  0, -1,  0,  1, -1, -1,  0,  1, -1};
+    float local_dis_f[13];  // = {sqrt3, sqrt2, sqrt3, sqrt2, sqrt1,
+                            //  sqrt2, sqrt1, sqrt2, sqrt1,
+                            //  sqrt3, sqrt2, sqrt3, sqrt2};
+    for(int i = 0; i< 13; i++){
+        float distance = 0.0;
+        if(dd_f[i] !=0) distance += spacing[0] *spacing[0];
+        if(dh_f[i] !=0) distance += spacing[1] *spacing[1];
+        if(dw_f[i] !=0) distance += spacing[2] *spacing[2];
+        distance = sqrt(distance);
+        local_dis_f[i] = distance;
+    }
+    // distance for backward pass
+    int dd_b[13] = {-1, -1, -1, -1,  0,  0,  0,  0,  1,  1,  1,  1,  1};
+    int dh_b[13] = { 0,  1,  1,  1,  0,  1,  1,  1,  0,  0,  1,  1,  1};
+    int dw_b[13] = { 1, -1,  0,  1,  1, -1,  0,  1,  0,  1, -1,  0,  1};
+    float local_dis_b[13];      // = {sqrt2, sqrt3, sqrt2, sqrt3, sqrt1,
+                                // sqrt2, sqrt1, sqrt2, sqrt1,
+                                // sqrt2, sqrt3, sqrt2, sqrt3};
+    for(int i = 0; i< 13; i++){
+        float distance = 0.0;
+        if(dd_b[i] !=0) distance += spacing[0] *spacing[0];
+        if(dh_b[i] !=0) distance += spacing[1] *spacing[1];
+        if(dw_b[i] !=0) distance += spacing[2] *spacing[2];
+        distance = sqrt(distance);
+        local_dis_b[i] = distance;
+    }
+
     for(int it = 0; it<iteration; it++)
     {
-        // forward scan
-        int dd_f[13] = {-1, -1, -1, -1, -1,  0,  0,  0,  0,  1,  1,  1,  1};
-        int dh_f[13] = {-1, -1, -1,  0,  0, -1, -1, -1,  0, -1, -1, -1,  0};
-        int dw_f[13] = {-1,  0,  1, -1,  0, -1,  0,  1, -1, -1,  0,  1, -1};
-        float local_dis_f[13] = {sqrt3, sqrt2, sqrt3, sqrt2, sqrt1,
-                                 sqrt2, sqrt1, sqrt2, sqrt1,
-                                 sqrt3, sqrt2, sqrt3, sqrt2};
         // forward pass
         for(int d = 0; d < depth; d++)
         {
@@ -224,12 +254,6 @@ void geodesic3d_raster_scan(const float * img, const unsigned char * seeds, floa
             }
         }
         
-        int dd_b[13] = {-1, -1, -1, -1,  0,  0,  0,  0,  1,  1,  1,  1,  1};
-        int dh_b[13] = { 0,  1,  1,  1,  0,  1,  1,  1,  0,  0,  1,  1,  1};
-        int dw_b[13] = { 1, -1,  0,  1,  1, -1,  0,  1,  0,  1, -1,  0,  1};
-        float local_dis_b[13] = {sqrt2, sqrt3, sqrt2, sqrt3, sqrt1,
-                                 sqrt2, sqrt1, sqrt2, sqrt1,
-                                 sqrt2, sqrt3, sqrt2, sqrt3};
         // backward pass
         for(int d = depth - 1; d >= 0; d--)
         {
