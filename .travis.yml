@@ -1,0 +1,27 @@
+language: c
+
+# Makes Travis clone the full repo so that the conda package can get the
+# correct string from git describe and correctly label the package
+git:
+  depth: false
+
+dist: bionic
+
+env:
+  global:
+    - MINICONDA_DIR=$HOME/miniconda
+
+before_script:
+  # download miniconda
+  - wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/miniconda.sh
+  - bash $HOME/miniconda.sh -b -p $MINICONDA_DIR
+  - source $MINICONDA_DIR/bin/activate $MINICONDA_DIR
+  - conda install anaconda conda-build
+
+
+jobs:
+  include:
+    - stage: build and deploy
+      name: Build and Deploy
+      script:
+        - conda build ./conda --user $UPLOAD_USER --token $ANACONDA_API_TOKEN
