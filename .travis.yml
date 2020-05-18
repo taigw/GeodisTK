@@ -23,7 +23,14 @@ before_script:
 
 jobs:
   include:
+    - stage: build
+      name: Build
+      if: branch != master
+      script:
+        - conda build ./conda
+
     - stage: build and deploy
       name: Build and Deploy
+      if: branch = master
       script:
         - conda build ./conda --user $UPLOAD_USER --token $ANACONDA_API_TOKEN
