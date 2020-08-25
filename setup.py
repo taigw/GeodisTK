@@ -31,7 +31,7 @@ else:
 
 setup(
     name    = package_name,
-    version = "0.1.6",
+    version = "0.1.7",
     author  ='Guotai Wang',
     author_email = 'wguotai@gmail.com',
     description  = description,
