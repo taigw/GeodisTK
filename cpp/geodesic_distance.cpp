@@ -62,7 +62,6 @@ geodesic2d_raster_scan_wrapper(PyObject *self, PyObject *args)
     PyObject *I=NULL, *Seed=NULL;
 	float lambda, iteration;
     PyArrayObject *arr_I=NULL, *arr_Seed=NULL;
-    
     if (!PyArg_ParseTuple(args, "OOff", &I, &Seed, &lambda, &iteration)) return NULL;
     
     arr_I = (PyArrayObject*)PyArray_FROM_OTF(I, NPY_FLOAT32, NPY_IN_ARRAY);
@@ -98,7 +97,7 @@ geodesic2d_raster_scan_wrapper(PyObject *self, PyObject *args)
     PyArrayObject * distance = (PyArrayObject*)  PyArray_SimpleNew(2, output_shape, NPY_FLOAT32);
     geodesic2d_raster_scan((const float *)arr_I->data, (const unsigned char *)arr_Seed->data, 
             (float *) distance->data, shape[0], shape[1], channel, lambda, (int)iteration);
-    
+
     Py_DECREF(arr_I);
     Py_DECREF(arr_Seed);
     //Py_INCREF(distance);

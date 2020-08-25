@@ -166,6 +166,7 @@ void geodesic2d_raster_scan(const float * img, const unsigned char * seeds, floa
             set_pixel<float>(distance, height, width, h, w, init_dis);
         }
     }
+
     for(int it = 0; it<iteration; it++)
     {
         // forward scan
