@@ -8,7 +8,7 @@ from PIL import Image
 
 def geodesic_distance_3d(I, S, spacing, lamb, iter):
     '''
-    get 3d geodesic disntance by raser scanning.
+    Get 3D geodesic disntance by raser scanning.
     I: input image array, can have multiple channels, with shape [D, H, W] or [D, H, W, C]
        Type should be np.float32.
     S: binary image where non-zero pixels are used as seeds, with shape [D, H, W]
