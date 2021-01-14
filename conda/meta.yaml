@@ -1,0 +1,34 @@
+{% set name = 'geodistk' %}
+{% set version = '0.1.6' %}
+
+package:
+  name: {{ name | lower }}
+  version: {{ version }}
+
+source:
+  git_url: ../
+
+requirements:
+  build:
+    - python {{ python }}
+    - numpy
+  run:
+    - python {{ python }}
+    - numpy
+
+build:
+  number: 0
+  script:
+    - {{ PYTHON }} -m pip install .
+
+test:
+  imports:
+    - GeodisTK
+
+app:
+  summary: "Geodesic distance transform of 2d/3d images"
+
+about:
+  home: https://github.com/taigw/GeodisTK
+  license: MIT
+  license_file: LICENSE
