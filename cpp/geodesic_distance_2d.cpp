@@ -9,7 +9,7 @@ using namespace std;
 float get_l2_distance(std::vector<float> p1, std::vector<float> p2)
 {
     float sq_sum = 0.0;
-    for(int d = 0; d < p1.size(); d++)
+    for(size_t d = 0; d < p1.size(); d++)
     {
         sq_sum = sq_sum + (p1[d] - p2[d]) * (p1[d] - p2[d]);
     }
@@ -20,7 +20,7 @@ float get_l2_distance(std::vector<float> p1, std::vector<float> p2)
 void insert_point_to_list(std::vector<Point2D> * list, int start_position,  Point2D p)
 {
     int insert_idx = list->size();
-    for(int i = start_position; i < list->size(); i++)
+    for(size_t i = start_position; i < list->size(); i++)
     {
         if(list->at(i).distance < p.distance)
         {
@@ -34,7 +34,7 @@ void insert_point_to_list(std::vector<Point2D> * list, int start_position,  Poin
 void update_point_in_list(std::vector<Point2D> * list, Point2D p)
 {
     int remove_idx = -1;
-    for(int i = 0; i < list->size(); i++)
+    for(size_t i = 0; i < list->size(); i++)
     {
         if(list->at(i).w == p.w && list->at(i).h == p.h)
         {
@@ -172,7 +172,7 @@ void geodesic2d_raster_scan(const float * img, const unsigned char * seeds, floa
         // forward scan
         int dh_f[4] = {-1, -1, -1, 0};
         int dw_f[4] = {-1, 0, 1, -1};
-        float local_dis_f[4] = {sqrt(2.0), 1.0, sqrt(2.0), 1.0};
+        float local_dis_f[4] = {sqrtf(2.0), 1.0, sqrtf(2.0), 1.0};
         // forward pass
         for(int h = 0; h < height; h++)
         {
@@ -200,7 +200,7 @@ void geodesic2d_raster_scan(const float * img, const unsigned char * seeds, floa
         // backward scann
         int dh_b[4] = {0, 1, 1, 1};
         int dw_b[4] = {1, -1, 0, 1};
-        float local_dis_b[4] = {1.0, sqrt(2.0), 1.0, sqrt(2.0)};
+        float local_dis_b[4] = {1.0, sqrtf(2.0), 1.0, sqrtf(2.0)};
         for(int h = height -1; h >= 0; h--)
         {
             for (int w = width - 1; w >= 0; w--)
